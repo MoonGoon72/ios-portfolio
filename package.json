@@ -1,0 +1,10 @@
+{
+  "name": "younggyun-ios-portfolio",
+  "private": true,
+  "scripts": {
+    "verify": "node render-check.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
