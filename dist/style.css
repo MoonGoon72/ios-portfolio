@@ -18,3 +18,4 @@
 @media print{.poster-details{display:none!important}.todakun-intro{margin-top:4mm}.todakun-intro a{max-width:110mm;margin:auto;border-radius:3mm}.todakun-intro figcaption{text-align:center;font-size:8pt}.todakun .overview-flow{margin-top:4mm;padding:4mm}.screens.direct .screen{border-radius:3mm}.feature-gallery{margin:0;padding-top:6mm}.feature-gallery h3{font-size:20pt}.feature-gallery>p{font-size:10pt}.feature-gallery .screen-item{max-width:53mm}.feature-gallery .gallery{margin-top:10mm}.feature-gallery .screens{padding:7mm}.case-group+.case-group{margin-top:0}}
 @media print{.tk8 .project-overview .screen-item{max-width:29mm}.tk8 .project-overview .print-only{font-size:8.5pt}}
 .lead{word-break:keep-all;overflow-wrap:anywhere;text-wrap:pretty}
+.lead .nowrap{white-space:nowrap}
