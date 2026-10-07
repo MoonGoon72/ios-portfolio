@@ -5,6 +5,7 @@ import json
 ROOT=Path(__file__).parent
 D=json.loads((ROOT/'content.json').read_text())
 def e(x): return esc(str(x),quote=True)
+def lead_text(x): return e(x).replace('·','&nbsp;·&nbsp;')
 def links(xs): return ''.join(f'<a href="{e(x["url"])}" target="_blank" rel="noopener">{e(x["title"])}</a>' for x in xs)
 def flow(xs): return '<ol class="flow">'+''.join(f'<li><span>{e(x)}</span></li>' for x in xs)+'</ol>'
 def gallery(key):
@@ -33,7 +34,7 @@ def project(p):
  tags='<div class="tags">'+''.join(f'<span class="tag">{e(t)}</span>' for t in p['tech'])+'</div>'
  roles='<div class="role-list"><h4>담당 범위</h4><ul>'+''.join('<li>'+e(s)+'</li>' for s in p['roles'])+'</ul></div>'
  print_extras='<div class="print-only">'+''.join(f'<p><b>{e(x["title"])} · </b>{e(x["text"])}</p>' for x in p.get('additional',[]))+f'<p><b>이 경험에서 남은 점 · </b>{e(p["reflection"])}</p></div>'
- overview=f'<div class="print-page project-overview">{header}<p class="lead">{e(p["description"])}</p>{tags}{roles}{status}{metrics}{media}{print_extras}</div>'
+ overview=f'<div class="print-page project-overview">{header}<p class="lead">{lead_text(p["description"])}</p>{tags}{roles}{status}{metrics}{media}{print_extras}</div>'
  groups=''
  cs=p.get('cases',[])
  for i in range(0,len(cs),2):
