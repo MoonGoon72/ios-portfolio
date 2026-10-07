@@ -19,3 +19,5 @@
 @media print{.tk8 .project-overview .screen-item{max-width:29mm}.tk8 .project-overview .print-only{font-size:8.5pt}}
 .lead{word-break:keep-all;overflow-wrap:anywhere;text-wrap:pretty}
 .lead .nowrap{white-space:nowrap}
+.reflection p+p{margin-top:14px}
+@media print{.reflection p+p{margin-top:3mm}}

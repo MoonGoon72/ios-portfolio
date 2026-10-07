@@ -37,7 +37,9 @@ def project(p):
  header=f'''<div class="project-top"><div><div class="project-number">{num} · {e(p['kind'])}</div><h2>{e(p['name'])}</h2><p class="subhead">{e(meta)}</p><p class="project-scope">{e(p['scope'])}</p></div>{l}</div>'''
  tags='<div class="tags">'+''.join(f'<span class="tag">{e(t)}</span>' for t in p['tech'])+'</div>'
  roles='<div class="role-list"><h4>담당 범위</h4><ul>'+''.join('<li>'+e(s)+'</li>' for s in p['roles'])+'</ul></div>'
- print_extras='<div class="print-only">'+''.join(f'<p><b>{e(x["title"])} · </b>{e(x["text"])}</p>' for x in p.get('additional',[]))+f'<p><b>이 경험에서 남은 점 · </b>{e(p["reflection"])}</p></div>'
+ reflection_parts=[s for s in p.get('reflection','').split('\n\n') if s.strip()]
+ print_reflection=''.join('<p>'+('<b>이 경험에서 남은 점 · </b>' if i==0 else '')+e(s)+'</p>' for i,s in enumerate(reflection_parts))
+ print_extras='<div class="print-only">'+''.join(f'<p><b>{e(x["title"])} · </b>{e(x["text"])}</p>' for x in p.get('additional',[]))+print_reflection+'</div>'
  overview=f'<div class="print-page project-overview">{header}<p class="lead">{lead_text(p["description"])}</p>{tags}{roles}{status}{metrics}{media}{print_extras}</div>'
  groups=''
  cs=p.get('cases',[])
@@ -46,7 +48,7 @@ def project(p):
   groups+=f'<div class="print-page case-group"><div class="print-chapter">{num} · {e(p["name"])} / 주요 사례</div>{cases}</div>'
  additional=''
  if p.get('additional'):additional='<div class="additional"><h4>함께 구현한 기능</h4>'+''.join(f'<div><b>{e(x["title"])}</b><p>{e(x["text"])}</p></div>' for x in p['additional'])+'</div>'
- reflection=f'<div class="reflection"><span>이 경험에서 남은 점</span><p>{e(p["reflection"])}</p></div>'
+ reflection='<div class="reflection"><span>이 경험에서 남은 점</span><div>'+''.join('<p>'+e(s)+'</p>' for s in reflection_parts)+'</div></div>' if reflection_parts else ''
  feature_media='<section class="print-page feature-gallery"><div class="project-number">'+num+' · 격투 게임 정보 앱</div><h3>영상으로 확인하고, 메모로 기록하기</h3><p>기술 상세 화면에서 동작 영상을 확인하고, 캐릭터별 메모로 학습 내용을 기록합니다.</p>'+gallery('tk8-features')+'</section>' if p['id']=='tk8' else ''
  return f'<article id="{p["id"]}" class="project {p["id"]}"><div class="wrap">{overview}{groups}{feature_media}<div class="project-ending">{additional}{reflection}</div></div></article>'
 nav=''.join(f'<a href="#{x["id"]}">{e(x["name"] if x["id"] in ["tk8","todakun","retstalk"] else "인턴" if x["id"]=="intern" else "Comi")}</a>' for x in D['projects'])
@@ -65,6 +67,6 @@ for p in D['projects']:
   if c.get('metric'):md.extend([c['metric']['before']+' → '+c['metric']['after'],c['metric']['note']])
   if c.get('note'):md.append(c['note'])
  for x in p.get('additional',[]):md.extend(['### '+x['title'],x['text']])
- md.append('이 경험에서 남은 점: '+p['reflection'])
+ if p.get('reflection'):md.append('이 경험에서 남은 점: '+p['reflection'])
 (ROOT/'portfolio-copy.md').write_text('\n\n'.join(md)+'\n')
 print(f'Built {len(D["projects"])} projects and {sum(len(p["cases"]) for p in D["projects"])} case studies')
