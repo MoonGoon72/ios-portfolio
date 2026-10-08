@@ -15,7 +15,7 @@ def flow(xs): return '<ol class="flow">'+''.join(f'<li><span>{e(x)}</span></li>'
 def gallery(key):
  if key in ('tk8','tk8-features'):
   items=[('characters','캐릭터 탐색'),('moves','기술 목록'),('search','기술 검색')] if key=='tk8' else [('video','기술 영상 재생'),('memo','캐릭터별 메모')]
-  return '<figure class="gallery"><div class="screens tk8 direct">'+''.join(f'<div class="screen-item"><a class="screen" href="assets/tk8-{cl}.png" target="_blank" rel="noopener" aria-label="{e(cap)} 화면 원본 보기"><img src="assets/tk8-{cl}.png" alt="{e(cap)} 화면" loading="lazy"></a><p>{e(cap)}</p></div>' for cl,cap in items)+'</div><figcaption>직접 제공한 개발 화면 · 이미지를 누르면 원본을 볼 수 있습니다.</figcaption></figure>'
+  return '<figure class="gallery"><div class="screens tk8 direct">'+''.join(f'<div class="screen-item"><a class="screen" href="assets/tk8-{cl}.png" target="_blank" rel="noopener" aria-label="{e(cap)} 화면 원본 보기"><img src="assets/tk8-{cl}.png" alt="{e(cap)} 화면" loading="lazy"></a><p>{e(cap)}</p></div>' for cl,cap in items)+'</div><figcaption>격투 게임 정보 앱의 개발 화면 · 이미지를 누르면 원본을 볼 수 있습니다.</figcaption></figure>'
  else:
   items=[('journals','회고 목록'),('chat','대화형 회고')];file='retstalk-preview.png'
  return '<figure class="gallery"><div class="screens '+key+'">'+''.join(f'<div class="screen-item"><div class="screen {cl}"><img src="assets/{file}" alt="{e(cap)} 화면" loading="lazy"></div><p>{e(cap)}</p></div>' for cl,cap in items)+'</div><figcaption>프로젝트 README에 보존된 당시 서비스 화면</figcaption></figure>'
