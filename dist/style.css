@@ -21,3 +21,7 @@
 .lead .nowrap{white-space:nowrap}
 .reflection p+p{margin-top:14px}
 @media print{.reflection p+p{margin-top:3mm}}
+
+.case[id]{scroll-margin-top:16px}.case-detail h4,.translation-examples h4{font-size:14px;color:var(--blue);margin:22px 0 8px}.case-detail p{margin:0}.translation-examples table{width:100%;border-collapse:collapse;font-size:14px}.translation-examples th,.translation-examples td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}.translation-examples th{background:var(--wash)}.case-sources{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:13px}@media print{.case-detail h4,.translation-examples h4{margin:12px 0 5px}.case-detail p{font-size:9pt}.translation-examples table{font-size:9pt}.translation-examples th,.translation-examples td{padding:5px 8px}.case-sources{font-size:8pt;margin-top:10px}}
+@media print{#tk8-localization{font-size:9pt;line-height:1.5}#tk8-localization .problem{font-size:9.5pt;line-height:1.6}#tk8-localization .case-detail h4,#tk8-localization .translation-examples h4{margin:9px 0 4px}#tk8-localization .flow{margin-bottom:3mm}#tk8-localization .case-detail p{line-height:1.5}#tk8-localization .case-sources{font-size:7.5pt}#tk8-localization .comparison{margin-top:2mm}#tk8-localization .case-columns li{margin-bottom:1mm}}
+@media print{#tk8-localization .case-columns{display:grid;grid-template-columns:1.55fr 1fr;gap:4mm}#tk8-localization .outcome{margin-top:0}#tk8-localization .case-detail h4{font-size:9pt}#tk8-localization .translation-examples h4{font-size:9pt}}

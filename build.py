@@ -24,7 +24,12 @@ def case(c,idx,first=False):
  if met:m=f'<div class="comparison"><div><span>변경 전</span><strong>{e(met["before"])}</strong></div><div><span>변경 후</span><strong>{e(met["after"])}</strong></div><p>{e(met["label"])}</p></div><p class="note">{e(met["note"])}</p>'
  f=flow(c['flow']) if c.get('flow') else ''
  note=f'<p class="note">{e(c["note"])}</p>' if c.get('note') else ''
- return f'''<details class="case" {'open' if first else ''}><summary><span class="case-index">{idx:02}</span><span><span class="case-label">{e(c['label'])}</span><h3>{e(c['title'])}</h3></span><span class="toggle" aria-hidden="true"></span></summary><div class="case-body"><p class="problem">{e(c['problem'])}</p>{f}<div class="case-columns"><div><h4>제가 한 작업</h4><ul>{''.join('<li>'+e(s)+'</li>' for s in c['actions'])}</ul></div><div class="outcome"><h4>달라진 점</h4><p>{e(c['result'])}</p></div></div>{m}{note}</div></details>'''
+ extra=''.join(f'<section class="case-detail"><h4>{e(x["title"])}</h4><p>{e(x["text"])}</p></section>' for x in c.get('detailSections',[]))
+ if c.get('examples'):
+  extra+='<div class="translation-examples"><h4>코드와 테스트에 있는 변환 예시</h4><table><thead><tr><th>한국어 원본</th><th>영어 표시</th></tr></thead><tbody>'+''.join(f'<tr><td>{e(x["before"])}</td><td>{e(x["after"])}</td></tr>' for x in c['examples'])+'</tbody></table></div>'
+ source_links='<div class="case-sources">'+links(c['sources'])+'</div>' if c.get('sources') else ''
+ anchor=f' id="{e(c["id"])}"' if c.get('id') else ''
+ return f'''<details{anchor} class="case" {'open' if first else ''}><summary><span class="case-index">{idx:02}</span><span><span class="case-label">{e(c['label'])}</span><h3>{e(c['title'])}</h3></span><span class="toggle" aria-hidden="true"></span></summary><div class="case-body"><p class="problem">{e(c['problem'])}</p>{f}<div class="case-columns"><div><h4>제가 한 작업</h4><ul>{''.join('<li>'+e(s)+'</li>' for s in c['actions'])}</ul></div><div class="outcome"><h4>달라진 점</h4><p>{e(c['result'])}</p></div></div>{extra}{m}{note}{source_links}</div></details>'''
 def project(p):
  num=p['number'];meta=f'{p["subtitle"]} · {p["period"]}'
  l=f'<div class="links">{links(p.get("links",[]))}</div>' if p.get('links') else ''
@@ -43,8 +48,17 @@ def project(p):
  overview=f'<div class="print-page project-overview">{header}<p class="lead">{lead_text(p["description"])}</p>{tags}{roles}{status}{metrics}{media}{print_extras}</div>'
  groups=''
  cs=p.get('cases',[])
- for i in range(0,len(cs),2):
-  cases=''.join(case(c,i+j+1,first=(i+j==0)) for j,c in enumerate(cs[i:i+2]))
+ chunks=[];pending=[]
+ for idx,c in enumerate(cs,1):
+  if c.get('ownPage'):
+   if pending: chunks.append(pending);pending=[]
+   chunks.append([(idx,c)])
+  else:
+   pending.append((idx,c))
+   if len(pending)==2: chunks.append(pending);pending=[]
+ if pending: chunks.append(pending)
+ for chunk in chunks:
+  cases=''.join(case(c,idx,first=(idx==1)) for idx,c in chunk)
   groups+=f'<div class="print-page case-group"><div class="print-chapter">{num} · {e(p["name"])} / 주요 사례</div>{cases}</div>'
  additional=''
  if p.get('additional'):additional='<div class="additional"><h4>함께 구현한 기능</h4>'+''.join(f'<div><b>{e(x["title"])}</b><p>{e(x["text"])}</p></div>' for x in p['additional'])+'</div>'
@@ -64,6 +78,9 @@ for p in D['projects']:
  md.append('### 담당 범위');md.extend('- '+s for s in p['roles'])
  for c in p.get('cases',[]):
   md.extend(['### '+c['title'],c['problem']]);md.extend('- '+s for s in c['actions']);md.append('결과: '+c['result'])
+  for x in c.get('detailSections',[]):md.extend(['#### '+x['title'],x['text']])
+  if c.get('examples'):md.append('\n'.join(['| 한국어 원본 | 영어 표시 |','|---|---|']+[f'| {x["before"]} | {x["after"]} |' for x in c['examples']]))
+  if c.get('sources'):md.append(' · '.join(f'[{x["title"]}]({x["url"]})' for x in c['sources']))
   if c.get('metric'):md.extend([c['metric']['before']+' → '+c['metric']['after'],c['metric']['note']])
   if c.get('note'):md.append(c['note'])
  for x in p.get('additional',[]):md.extend(['### '+x['title'],x['text']])

@@ -22,6 +22,18 @@ const os = require('os');
   checks.push({width,overflow,broken});
  }
  await page.screenshot({path:path.join(os.tmpdir(),'portfolio-mobile.png')});
+ await page.goto('http://127.0.0.1:8765/#tk8-localization',{waitUntil:'networkidle'});
+ const localized=page.locator('#tk8-localization');
+ const directLinkOpen=await localized.evaluate(el=>el.open);
+ await page.waitForFunction(()=>Math.abs(document.querySelector('#tk8-localization').getBoundingClientRect().top-116)<20);
+ await page.screenshot({path:path.join(os.tmpdir(),'portfolio-localization-mobile.png')});
+ await page.setViewportSize({width:1440,height:1050});
+ await localized.screenshot({path:path.join(os.tmpdir(),'portfolio-localization.png')});
+ await page.evaluate(()=>{location.hash='tk8';});
+ await page.evaluate(()=>{document.querySelector('#tk8-localization').open=false;location.hash='tk8-localization';});
+ await page.waitForFunction(()=>document.querySelector('#tk8-localization').open);
+ checks.push({directLinkOpen,hashChangeOpen:await localized.evaluate(el=>el.open)});
+ if(!directLinkOpen) throw new Error('Localization direct link did not open');
  const count=await page.locator('.case').count();
  const firstClosed=page.locator('.case').nth(1);
  await firstClosed.locator('summary').click();
