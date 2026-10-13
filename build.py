@@ -24,12 +24,18 @@ def case(c,idx,first=False):
  if met:m=f'<div class="comparison"><div><span>변경 전</span><strong>{e(met["before"])}</strong></div><div><span>변경 후</span><strong>{e(met["after"])}</strong></div><p>{e(met["label"])}</p></div><p class="note">{e(met["note"])}</p>'
  f=flow(c['flow']) if c.get('flow') else ''
  note=f'<p class="note">{e(c["note"])}</p>' if c.get('note') else ''
+ diagram=''
+ if c.get('diagramRows'):
+  if c['id']=='retstalk-cloudkit':
+   diagram='<figure class="case-diagram"><figcaption>변경 전후 · 회고 목록 갱신 흐름</figcaption><div class="diagram-sequences">'+''.join(f'<section class="diagram-cell {"diagram-before" if i==0 else "diagram-after"}"><h4 class="diagram-label">{e(x["title"])}</h4><p>{e(x["before"])}</p><span class="sequence-arrow" aria-hidden="true">↓</span><p>{e(x["after"])}</p></section>' for i,x in enumerate(c['diagramRows']))+'</div></figure>'
+  else:
+   diagram='<figure class="case-diagram"><figcaption>변경 전후 · 처리 방식과 책임</figcaption>'+''.join(f'<div class="diagram-row"><b class="diagram-topic">{e(x["title"])}</b><div class="diagram-cell diagram-before"><span class="diagram-label">변경 전</span><p>{e(x["before"])}</p></div><div class="diagram-cell diagram-after"><span class="diagram-label">변경 후</span><p>{e(x["after"])}</p></div></div>' for x in c['diagramRows'])+'</figure>'
  extra=''.join(f'<section class="case-detail"><h4>{e(x["title"])}</h4><p>{e(x["text"])}</p></section>' for x in c.get('detailSections',[]))
  if c.get('examples'):
   extra+='<div class="translation-examples"><h4>코드와 테스트에 있는 변환 예시</h4><table><thead><tr><th>한국어 원본</th><th>영어 표시</th></tr></thead><tbody>'+''.join(f'<tr><td>{e(x["before"])}</td><td>{e(x["after"])}</td></tr>' for x in c['examples'])+'</tbody></table></div>'
  source_links='<div class="case-sources">'+links(c['sources'])+'</div>' if c.get('sources') else ''
  anchor=f' id="{e(c["id"])}"' if c.get('id') else ''
- return f'''<details{anchor} class="case" {'open' if first else ''}><summary><span class="case-index">{idx:02}</span><span><span class="case-label">{e(c['label'])}</span><h3>{e(c['title'])}</h3></span><span class="toggle" aria-hidden="true"></span></summary><div class="case-body"><p class="problem">{e(c['problem'])}</p>{f}<div class="case-columns"><div><h4>제가 한 작업</h4><ul>{''.join('<li>'+e(s)+'</li>' for s in c['actions'])}</ul></div><div class="outcome"><h4>달라진 점</h4><p>{e(c['result'])}</p></div></div>{extra}{m}{note}{source_links}</div></details>'''
+ return f'''<details{anchor} class="case" {'open' if first else ''}><summary><span class="case-index">{idx:02}</span><span><span class="case-label">{e(c['label'])}</span><h3>{e(c['title'])}</h3></span><span class="toggle" aria-hidden="true"></span></summary><div class="case-body"><p class="problem">{e(c['problem'])}</p>{f}{diagram}<div class="case-columns"><div><h4>제가 한 작업</h4><ul>{''.join('<li>'+e(s)+'</li>' for s in c['actions'])}</ul></div><div class="outcome"><h4>달라진 점</h4><p>{e(c['result'])}</p></div></div>{extra}{m}{note}{source_links}</div></details>'''
 def project(p):
  num=p['number'];meta=f'{p["subtitle"]} · {p["period"]}'
  l=f'<div class="links">{links(p.get("links",[]))}</div>' if p.get('links') else ''
@@ -63,8 +69,7 @@ def project(p):
  additional=''
  if p.get('additional'):additional='<div class="additional"><h4>함께 구현한 기능</h4>'+''.join(f'<div><b>{e(x["title"])}</b><p>{e(x["text"])}</p></div>' for x in p['additional'])+'</div>'
  reflection='<div class="reflection"><span>이 경험에서 남은 점</span><div>'+''.join('<p>'+e(s)+'</p>' for s in reflection_parts)+'</div></div>' if reflection_parts else ''
- feature_media='<section class="print-page feature-gallery"><div class="project-number">'+num+' · 격투 게임 정보 앱</div><h3>영상으로 확인하고, 메모로 기록하기</h3><p>기술 상세 화면에서 동작 영상을 확인하고, 캐릭터별 메모로 학습 내용을 기록합니다.</p>'+gallery('tk8-features')+'</section>' if p['id']=='tk8' else ''
- return f'<article id="{p["id"]}" class="project {p["id"]}"><div class="wrap">{overview}{groups}{feature_media}<div class="project-ending">{additional}{reflection}</div></div></article>'
+ return f'<article id="{p["id"]}" class="project {p["id"]}"><div class="wrap">{overview}{groups}<div class="project-ending">{additional}{reflection}</div></div></article>'
 nav=''.join(f'<a href="#{x["id"]}">{e(x["name"] if x["id"] in ["tk8","todakun","retstalk"] else "인턴" if x["id"]=="intern" else "Comi")}</a>' for x in D['projects'])
 toc='<div class="print-toc"><h3>프로젝트</h3>'+''.join(f'<a href="#{p["id"]}"><b>{p["number"]} · {e(p["name"])}</b><span>{e(p["scope"])}</span></a>' for p in D['projects'])+'</div>'
 style_hash=hashlib.sha256((ROOT/'dist/style.css').read_bytes()).hexdigest()[:12]
@@ -78,6 +83,7 @@ for p in D['projects']:
  md.append('### 담당 범위');md.extend('- '+s for s in p['roles'])
  for c in p.get('cases',[]):
   md.extend(['### '+c['title'],c['problem']]);md.extend('- '+s for s in c['actions']);md.append('결과: '+c['result'])
+  for x in c.get('diagramRows',[]):md.append(x['title']+': '+x['before']+' → '+x['after'])
   for x in c.get('detailSections',[]):md.extend(['#### '+x['title'],x['text']])
   if c.get('examples'):md.append('\n'.join(['| 한국어 원본 | 영어 표시 |','|---|---|']+[f'| {x["before"]} | {x["after"]} |' for x in c['examples']]))
   if c.get('sources'):md.append(' · '.join(f'[{x["title"]}]({x["url"]})' for x in c['sources']))
